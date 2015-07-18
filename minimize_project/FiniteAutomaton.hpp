@@ -95,7 +95,11 @@ class FiniteAutomaton
     /// Returns NoState() if p is undefined.
     inline State find_transition(State q, Symbol a) const
     {
-      // TODO
+      // DONE
+      if (q < 0 || q >= delta.size()) return NoState();
+      const State& nextState = delta[q].find(a);
+      if (nextState == deta[q].end()) return NoState();
+      return nextState
     }
 
     /// Makes q final
@@ -113,42 +117,70 @@ class FiniteAutomaton
     /// Add a transition from q with symbol a to an unused state
     inline State add_transition(State q, Symbol a)
     {
-      // TODO
+      // DONE
+      delta[q][a] = new_state();
     }
 
     /// Returns true iff state q has outgoing transitions
     inline bool has_transitions(State q) const
     {
-      // TODO
+      // DONE
+      return (delta[q].size() > 0);
     }
 
     /// Find the lexicographic last child of q
     inline State last_child(State q) const
     {
-      // TODO
+      // DONE
+      return delta[q].rbegin();
     }
 
     /// Returns an unused state 
     inline State new_state()
     {
+      // DONE - (UNSURE)
       // Ensure that in the delta-vector an empty symbol-state map exists
       // at a formerly unused position and return that position index 
       // Instead of using numeric_limits for the states, we make use of
       // vector's max_size() function
+      if (!free_states.empty()) {
+        auto const_it = free_states.cbegin();
+        State freeState = *const_it;
+        free_states.erase(const_it);
+        return freeState;
+      } else {
+        if (delta.size() < delta.max_size()) {
+          SymbolStateMap ssm;
+          delta.push_back(ssm);
+          return delta.size();
+        } else {
+          return NoState();
+        }
+      }
     }
 
     inline void replace_state(State p, State q)
     {
+      // DONE
+      delta[q].insert(delta[p].begin(), delta[p].end());
+      for (unsigned tmp = 0; tmp < delta.size(); ++tmp) {
+        for (auto it = delta[tmp].begin(), delta[tmp].end()) {
+          if (it->second == p) delta[tmp][it->first] = q;
+        }
+      }
     }
 
     /// Delete state by clearing its transition map and putting it on the free list
     inline void delete_state(State q)
     {
-      // TODO
+      // DONE
+      delta[q].clear();
+      free_states.insert(q);
     }
   
   private:
     Delta delta;                   ///< Delta-function
+    StateSet free_states;          ///< Free states
     StateSet final_states;         ///< Final states 
   }; // FiniteAutomaton
 

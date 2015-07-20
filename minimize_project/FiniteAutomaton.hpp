@@ -1,3 +1,9 @@
+/*
+ * author: Rene Knaebel
+ * date  : 20.07.2015
+ */
+
+
 #ifndef __FINITEAUTOMATON_HPP__
 #define __FINITEAUTOMATON_HPP__
 
@@ -164,6 +170,12 @@ class FiniteAutomaton
     inline void replace_state(State p, State q)
     {
       // DONE
+      auto it = final_states.find(p);
+      if (it != final_states.end()) {
+        final_states.erase(it);
+        final_states.insert(q);
+      }
+        
       delta[q].insert(delta[p].begin(), delta[p].end());
       for (unsigned tmp = 0; tmp < delta.size(); ++tmp) {
         for (auto it = delta[tmp].begin(); it != delta[tmp].end(); ++it) {
